@@ -1,6 +1,6 @@
 {
   "name": "backend-project-lvl2",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "cli utility for comparing config files",
   "keywords": [
     "node.js",
@@ -9,7 +9,15 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +28,14 @@
   "bugs": {
     "url": "https://github.com/ushachev/backend-project-lvl2/issues"
   },
-  "homepage": "https://github.com/ushachev/backend-project-lvl2#readme"
+  "homepage": "https://github.com/ushachev/backend-project-lvl2#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.6",
+    "@babel/node": "^7.8.4",
+    "@babel/preset-env": "^7.8.6"
+  },
+  "dependencies": {
+    "commander": "^4.1.1"
+  }
 }
