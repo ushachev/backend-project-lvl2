@@ -1,0 +1,10 @@
+env:
+  node: true
+extends:
+  - airbnb-base
+plugins:
+  - babel
+parser: babel-eslint
+rules: {
+  no-console: 0,
+}
