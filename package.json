@@ -1,0 +1,24 @@
+{
+  "name": "backend-project-lvl2",
+  "version": "1.0.0",
+  "description": "cli utility for comparing config files",
+  "keywords": [
+    "node.js",
+    "cli-utility",
+    "config files"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ushachev/backend-project-lvl2.git"
+  },
+  "author": "Vitaliy Ushachev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ushachev/backend-project-lvl2/issues"
+  },
+  "homepage": "https://github.com/ushachev/backend-project-lvl2#readme"
+}
