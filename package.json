@@ -1,14 +1,15 @@
 {
-  "name": "backend-project-lvl2",
-  "version": "0.0.1",
+  "name": "genDiff",
+  "version": "0.0.2",
   "description": "cli utility for comparing config files",
   "keywords": [
     "node.js",
     "cli-utility",
     "config files"
   ],
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build"
   },
@@ -34,12 +35,15 @@
     "@babel/node": "^7.8.4",
     "@babel/preset-env": "^7.8.6",
     "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.1.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.20.1"
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "^25.1.0"
   },
   "dependencies": {
-    "commander": "^4.1.1"
+    "commander": "^4.1.1",
+    "lodash": "^4.17.15"
   }
 }

@@ -19,8 +19,21 @@ $ make install
 $ make publish
 $ sudo npm link
 ```
-this will create a symlink to the package after that it will become possible to launch the application from the command line by typing
+this will create a symlink to the package after that it will become possible to use the package as a library in your project
+
+```sh
+$ cd your/project/diretory
+$ npm link genDiff
+```
+like this
+
+[![asciicast](https://asciinema.org/a/SeHXXvH4yzyDE57RRSH8OjzJA.svg)](https://asciinema.org/a/SeHXXvH4yzyDE57RRSH8OjzJA)
+
+or launch the application from the command line by typing
 
 ```sh
 $ gendiff
 ```
+like this
+
+[![asciicast](https://asciinema.org/a/PMofhfyqQVimjjeGh5ouPLnPo.svg)](https://asciinema.org/a/PMofhfyqQVimjjeGh5ouPLnPo)
