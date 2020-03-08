@@ -1,8 +1,9 @@
-import { formatDiff } from '../src';
-import genDiff from '../src';
+import path from 'path';
+import genDiff, { formatDiff } from '../src';
 
-const pathToFile1 = '__tests__/data/before.json';
-const pathToFile2 = '__tests__/data/after.json';
+const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
+const pathToFile1 = getFixturePath('before.json');
+const pathToFile2 = getFixturePath('after.json');
 
 const expected = [
   [' ', 'host: hexlet.io'],

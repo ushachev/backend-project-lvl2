@@ -6,6 +6,7 @@ Educational "Project #2" is being developed as part of "Backend Javascript (node
 ##
 
 # Config difference generator
+Compares two configuration files and shows a difference.
 
 ## Setup
 

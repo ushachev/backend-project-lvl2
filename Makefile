@@ -1,5 +1,5 @@
 install:
-	npm install
+	npm ci
 start:
 	npx babel-node src/bin/gendiff.js ${o}
 publish:
@@ -8,3 +8,8 @@ lint:
 	npx eslint .
 test:
 	npm test
+test-coverage:
+	npm test -- --coverage
+build:
+	npm run build
+
