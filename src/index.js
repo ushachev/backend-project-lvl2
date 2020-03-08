@@ -10,21 +10,19 @@ const getConfig = (pathToFile) => {
   return config;
 };
 
-const compare = (config1, config2) => (
-  union(Object.keys(config1), Object.keys(config2))
-    .flatMap((key) => {
-      const makeEntry = (config) => `${key}: ${config[key]}`;
+const compare = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
+  .flatMap((key) => {
+    const makeEntry = (config) => `${key}: ${config[key]}`;
 
-      if (has(config1, key) && has(config2, key)) {
-        return config1[key] === config2[key]
-          ? [[' ', makeEntry(config1)]]
-          : [['-', makeEntry(config1)], ['+', makeEntry(config2)]];
-      }
-      if (has(config1, key)) return [['-', makeEntry(config1)]];
+    if (has(config1, key) && has(config2, key)) {
+      return config1[key] === config2[key]
+        ? [[' ', makeEntry(config1)]]
+        : [['-', makeEntry(config1)], ['+', makeEntry(config2)]];
+    }
+    if (has(config1, key)) return [['-', makeEntry(config1)]];
 
-      return [['+', makeEntry(config2)]];
-    })
-);
+    return [['+', makeEntry(config2)]];
+  });
 
 export const formatDiff = (diff) => `{\n  ${
   diff.map((a) => a.join(' ')).join(',\n  ')
