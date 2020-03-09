@@ -42,3 +42,4 @@ $ gendiff
 like this
 
 [![asciicast](https://asciinema.org/a/PMofhfyqQVimjjeGh5ouPLnPo.svg)](https://asciinema.org/a/PMofhfyqQVimjjeGh5ouPLnPo)
+[![asciicast](https://asciinema.org/a/wUNqYX5xmN5tAw50xDzkGyADu.svg)](https://asciinema.org/a/wUNqYX5xmN5tAw50xDzkGyADu)
