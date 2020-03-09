@@ -7,9 +7,9 @@ const getConfig = (pathToFile) => {
   const fullPath = path.resolve(process.cwd(), pathToFile);
   const content = fs.readFileSync(fullPath, 'utf8');
   const format = path.extname(pathToFile);
-  const parser = getParser(format);
+  const parse = getParser(format);
 
-  return parser(content);
+  return parse(content);
 };
 
 const getEntryByKey = (key, config1, config2) => {
@@ -28,7 +28,7 @@ const getEntryByKey = (key, config1, config2) => {
 const compare = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
   .flatMap((key) => getEntryByKey(key, config1, config2));
 
-export const formatDiff = (diff) => `{\n  ${
+const formatDiff = (diff) => `{\n  ${
   diff.map((a) => a.join(' ')).join(',\n  ')
 }\n}`;
 

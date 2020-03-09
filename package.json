@@ -1,6 +1,6 @@
 {
   "name": "genDiff",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "cli utility for comparing config files",
   "keywords": [
     "node.js",
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "commander": "^4.1.1",
+    "ini": "^1.3.5",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15"
   }

@@ -6,7 +6,7 @@ import genDiff from '..';
 const program = new commander.Command();
 
 program
-  .version('0.0.2')
+  .version('0.2.0')
   .description('Compares two configuration files and shows a difference.')
   .option('-f, --format [type]', 'output format')
   .arguments('<path1> <path2>')

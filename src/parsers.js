@@ -1,8 +1,10 @@
 import yaml from 'js-yaml';
+import ini from 'ini';
 
 const parsersMap = {
-  '.json': (content) => JSON.parse(content),
-  '.yml': (content) => yaml.load(content),
+  '.json': JSON.parse,
+  '.yml': yaml.load,
+  '.ini': ini.parse,
 };
 
 export default (format) => parsersMap[format];
