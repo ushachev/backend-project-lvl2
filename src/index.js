@@ -1,43 +1,48 @@
 import fs from 'fs';
 import path from 'path';
-import { union, has } from 'lodash';
+import { union, has, isObject } from 'lodash';
 import getParser from './parsers';
+import getRenderer from './renderers';
 
 const getConfig = (pathToFile) => {
   const fullPath = path.resolve(process.cwd(), pathToFile);
   const content = fs.readFileSync(fullPath, 'utf8');
-  const format = path.extname(pathToFile);
-  const parse = getParser(format);
+  const extName = path.extname(pathToFile);
+  const parse = getParser(extName);
 
   return parse(content);
 };
 
-const getEntryByKey = (key, config1, config2) => {
-  const formEntry = (flag, config) => [flag, `${key}: ${config[key]}`];
+const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
+  .map((key) => {
+    const value1 = config1[key];
+    const value2 = config2[key];
 
-  if (has(config1, key) && has(config2, key)) {
-    return config1[key] === config2[key]
-      ? [formEntry(' ', config1)]
-      : [formEntry('-', config1), formEntry('+', config2)];
-  }
-  if (has(config1, key)) return [formEntry('-', config1)];
+    if (isObject(value1) && isObject(value2)) {
+      return { status: 'unchanged', key, children: compareConfigs(value1, value2) };
+    }
 
-  return [formEntry('+', config2)];
-};
+    const presence = has(config2, key) - has(config1, key);
+    const comparingMap = {
+      '-1': { status: 'deleted', key, value: value1 },
+      1: { status: 'added', key, value: value2 },
+      0: value1 === value2
+        ? { status: 'unchanged', key, value: value1 }
+        : {
+          status: 'changed', key, value: value1, newValue: value2,
+        },
+    };
 
-const compare = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
-  .flatMap((key) => getEntryByKey(key, config1, config2));
+    return comparingMap[presence];
+  });
 
-const formatDiff = (diff) => `{\n  ${
-  diff.map((a) => a.join(' ')).join(',\n  ')
-}\n}`;
-
-const genDiff = (pathToFile1, pathToFile2) => {
+const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {
   const config1 = getConfig(pathToFile1);
   const config2 = getConfig(pathToFile2);
-  const diff = compare(config1, config2);
+  const diff = compareConfigs(config1, config2);
+  const render = getRenderer(format);
 
-  return formatDiff(diff);
+  return render(diff);
 };
 
 export default genDiff;

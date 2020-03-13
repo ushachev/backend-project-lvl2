@@ -7,4 +7,4 @@ const parsersMap = {
   '.ini': ini.parse,
 };
 
-export default (format) => parsersMap[format];
+export default (extName) => parsersMap[extName];
