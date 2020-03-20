@@ -8,32 +8,32 @@ const statusMap = {
 
 const convertChanged = (row) => {
   const {
-    status, key, value, children = null, newValue,
+    status, name, value, children = null, newValue,
   } = row;
-  if (children) return { status, key, children: children.flatMap(convertChanged) };
+  if (children) return { status, name, children: children.flatMap(convertChanged) };
 
   return status === 'changed'
     ? [
-      { status: 'deleted', key, value },
-      { status: 'added', key, value: newValue },
+      { status: 'deleted', name, value },
+      { status: 'added', name, value: newValue },
     ]
     : row;
 };
 
 const convertNested = (row) => {
   const {
-    status, key, value, children = null,
+    status, name, value, children = null,
   } = row;
-  if (children) return { status, key, children: children.map(convertNested) };
+  if (children) return { status, name, children: children.map(convertNested) };
 
   return isObject(value)
     ? {
       status,
-      key,
+      name,
       children: Object.entries(value)
         .map(([nestedKey, nestedValue]) => ({
           status: 'unchanged',
-          key: nestedKey,
+          name: nestedKey,
           value: nestedValue,
         }))
         .map(convertNested),
@@ -41,26 +41,26 @@ const convertNested = (row) => {
     : row;
 };
 
-const stringifyPretty = (row, nestingLevel) => {
+const stringifyRowPretty = (row, nestingLevel) => {
   const {
-    status, key, value, children = null,
+    status, name, value, children = null,
   } = row;
-  const indent = ' '.repeat(2 * nestingLevel);
+  const indent = ' '.repeat(4 * nestingLevel - 2);
 
   return (children)
     ? [
-      `${indent}${statusMap[status]} ${key}: {`,
-      children.map((nestedRow) => stringifyPretty(nestedRow, nestingLevel + 2)),
+      `${indent}${statusMap[status]} ${name}: {`,
+      children.map((nestedRow) => stringifyRowPretty(nestedRow, nestingLevel + 1)),
       `${indent}  }`,
     ]
-    : `${indent}${statusMap[status]} ${key}: ${value}`;
+    : `${indent}${statusMap[status]} ${name}: ${value}`;
 };
 
 const renderPretty = (diff) => `{\n${
   diff
     .flatMap(convertChanged)
     .map(convertNested)
-    .map((row) => stringifyPretty(row, 1))
+    .map((row) => stringifyRowPretty(row, 1))
     .flat(Infinity)
     .join('\n')
 }\n}`;

@@ -13,27 +13,45 @@ const getConfig = (pathToFile) => {
   return parse(content);
 };
 
+const parameterActions = [
+  {
+    status: 'unchanged',
+    check: (presence, value1, value2) => isObject(value1) && isObject(value2),
+    process: (value1, value2, f) => ({ children: f(value1, value2) }),
+  },
+  {
+    status: 'unchanged',
+    check: (presence, value1, value2) => value1 === value2,
+    process: (value1) => ({ value: value1 }),
+  },
+  {
+    status: 'changed',
+    check: (presence) => presence === 0,
+    process: (value1, value2) => ({ value: value1, newValue: value2 }),
+  },
+  {
+    status: 'added',
+    check: (presence) => presence === 1,
+    process: (value1, value2) => ({ value: value2 }),
+  },
+  {
+    status: 'deleted',
+    check: (presence) => presence === -1,
+    process: (value1) => ({ value: value1 }),
+  },
+];
+
+const getParameterAction = (presence, value1, value2) => parameterActions
+  .find(({ check }) => check(presence, value1, value2));
+
 const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
   .map((key) => {
+    const presence = has(config2, key) - has(config1, key);
     const value1 = config1[key];
     const value2 = config2[key];
+    const { status, process } = getParameterAction(presence, value1, value2);
 
-    if (isObject(value1) && isObject(value2)) {
-      return { status: 'unchanged', key, children: compareConfigs(value1, value2) };
-    }
-
-    const presence = has(config2, key) - has(config1, key);
-    const comparingMap = {
-      '-1': { status: 'deleted', key, value: value1 },
-      1: { status: 'added', key, value: value2 },
-      0: value1 === value2
-        ? { status: 'unchanged', key, value: value1 }
-        : {
-          status: 'changed', key, value: value1, newValue: value2,
-        },
-    };
-
-    return comparingMap[presence];
+    return { name: key, status, ...process(value1, value2, compareConfigs) };
   });
 
 const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {
