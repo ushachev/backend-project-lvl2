@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { union, has, isObject } from 'lodash';
 import getParser from './parsers';
-import getRenderer from './renderers';
+import { formatInPretty, formatInPlain } from './formatters';
 
 const getConfig = (pathToFile) => {
   const fullPath = path.resolve(process.cwd(), pathToFile);
@@ -54,13 +54,17 @@ const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.
     return { name: key, status, ...process(value1, value2, compareConfigs) };
   });
 
+const formatters = {
+  pretty: (diff) => formatInPretty(diff),
+  plain: (diff) => formatInPlain(diff),
+};
+
 const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {
   const config1 = getConfig(pathToFile1);
   const config2 = getConfig(pathToFile2);
   const diff = compareConfigs(config1, config2);
-  const render = getRenderer(format);
 
-  return render(diff);
+  return formatters[format](diff);
 };
 
 export default genDiff;

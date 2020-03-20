@@ -1,11 +1,5 @@
 import { isObject } from 'lodash';
 
-const statusMap = {
-  deleted: '-',
-  added: '+',
-  unchanged: ' ',
-};
-
 const convertChanged = (row) => {
   const {
     status, name, value, children = null, newValue,
@@ -41,7 +35,13 @@ const convertNested = (row) => {
     : row;
 };
 
-const stringifyRowPretty = (row, nestingLevel) => {
+const statusMapping = {
+  deleted: '-',
+  added: '+',
+  unchanged: ' ',
+};
+
+const stringifyRow = (row, nestingLevel) => {
   const {
     status, name, value, children = null,
   } = row;
@@ -49,24 +49,18 @@ const stringifyRowPretty = (row, nestingLevel) => {
 
   return (children)
     ? [
-      `${indent}${statusMap[status]} ${name}: {`,
-      children.map((nestedRow) => stringifyRowPretty(nestedRow, nestingLevel + 1)),
+      `${indent}${statusMapping[status]} ${name}: {`,
+      children.map((nestedRow) => stringifyRow(nestedRow, nestingLevel + 1)),
       `${indent}  }`,
     ]
-    : `${indent}${statusMap[status]} ${name}: ${value}`;
+    : `${indent}${statusMapping[status]} ${name}: ${value}`;
 };
 
-const renderPretty = (diff) => `{\n${
+export default (diff) => `{\n${
   diff
     .flatMap(convertChanged)
     .map(convertNested)
-    .map((row) => stringifyRowPretty(row, 1))
+    .map((row) => stringifyRow(row, 1))
     .flat(Infinity)
     .join('\n')
 }\n}`;
-
-const renderersMap = {
-  pretty: renderPretty,
-};
-
-export default (format) => renderersMap[format];
