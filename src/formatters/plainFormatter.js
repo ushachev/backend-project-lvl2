@@ -1,32 +1,15 @@
 import { isObject } from 'lodash';
 
-const formatActions = [
-  {
-    check: (value) => typeof value === 'string',
-    process: (value) => `'${value}'`,
-  },
-  {
-    check: (value) => isObject(value),
-    process: () => '[complex value]',
-  },
-  {
-    check: () => true,
-    process: (value) => value,
-  },
-];
-
-const getFormatAction = (value) => formatActions.find(({ check }) => check(value));
-
 const format = (value) => {
-  const { process } = getFormatAction(value);
-  return process(value);
+  if (isObject(value)) return '[complex value]';
+  return typeof value === 'string' ? `'${value}'` : value;
 };
 
 const propertyActions = [
   {
     check: (status, children) => children,
-    process: (parent, { name, children }, f) => {
-      const { rows } = children.reduce(f, { parent: [...parent, name], rows: [] });
+    process: (parent, { property, children }, f) => {
+      const { rows } = children.reduce(f, { parent: [...parent, property], rows: [] });
       return rows;
     },
   },
@@ -36,21 +19,23 @@ const propertyActions = [
   },
   {
     check: (status) => status === 'changed',
-    process: (parent, { name, value, newValue }) => {
-      const nestedName = [...parent, name].join('.');
+    process: (parent, { property, value, newValue }) => {
+      const nestedProperty = [...parent, property].join('.');
       return [
-        `Property '${nestedName}' was changed from ${format(value)} to ${format(newValue)}`,
+        `Property '${nestedProperty}' was changed from ${format(value)} to ${format(newValue)}`,
       ];
     },
   },
   {
     check: (status) => status === 'deleted',
-    process: (parent, { name }) => [`Property '${[...parent, name].join('.')}' was deleted`],
+    process: (parent, { property }) => [
+      `Property '${[...parent, property].join('.')}' was deleted`,
+    ],
   },
   {
     check: (status) => status === 'added',
-    process: (parent, { name, value }) => [
-      `Property '${[...parent, name].join('.')}' was added with value: ${format(value)}`,
+    process: (parent, { property, value }) => [
+      `Property '${[...parent, property].join('.')}' was added with value: ${format(value)}`,
     ],
   },
 ];

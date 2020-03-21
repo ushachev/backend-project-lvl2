@@ -1,4 +1,6 @@
 import formatInPretty from './prettyFormatter';
 import formatInPlain from './plainFormatter';
 
-export { formatInPretty, formatInPlain };
+const formatInJson = (diff) => JSON.stringify(diff, null, 2);
+
+export { formatInPretty, formatInPlain, formatInJson };

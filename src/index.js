@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { union, has, isObject } from 'lodash';
 import getParser from './parsers';
-import { formatInPretty, formatInPlain } from './formatters';
+import { formatInPretty, formatInPlain, formatInJson } from './formatters';
 
 const getConfig = (pathToFile) => {
   const fullPath = path.resolve(process.cwd(), pathToFile);
@@ -13,7 +13,7 @@ const getConfig = (pathToFile) => {
   return parse(content);
 };
 
-const parameterActions = [
+const propertyActions = [
   {
     status: 'unchanged',
     check: (presence, value1, value2) => isObject(value1) && isObject(value2),
@@ -41,7 +41,7 @@ const parameterActions = [
   },
 ];
 
-const getParameterAction = (presence, value1, value2) => parameterActions
+const getPropertyAction = (presence, value1, value2) => propertyActions
   .find(({ check }) => check(presence, value1, value2));
 
 const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
@@ -49,14 +49,15 @@ const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.
     const presence = has(config2, key) - has(config1, key);
     const value1 = config1[key];
     const value2 = config2[key];
-    const { status, process } = getParameterAction(presence, value1, value2);
+    const { status, process } = getPropertyAction(presence, value1, value2);
 
-    return { name: key, status, ...process(value1, value2, compareConfigs) };
+    return { property: key, status, ...process(value1, value2, compareConfigs) };
   });
 
 const formatters = {
   pretty: (diff) => formatInPretty(diff),
   plain: (diff) => formatInPlain(diff),
+  json: (diff) => formatInJson(diff),
 };
 
 const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {

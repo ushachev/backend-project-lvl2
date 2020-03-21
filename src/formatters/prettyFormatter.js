@@ -2,32 +2,32 @@ import { isObject } from 'lodash';
 
 const convertChanged = (row) => {
   const {
-    status, name, value, children = null, newValue,
+    status, property, value, children = null, newValue,
   } = row;
-  if (children) return { status, name, children: children.flatMap(convertChanged) };
+  if (children) return { status, property, children: children.flatMap(convertChanged) };
 
   return status === 'changed'
     ? [
-      { status: 'deleted', name, value },
-      { status: 'added', name, value: newValue },
+      { status: 'deleted', property, value },
+      { status: 'added', property, value: newValue },
     ]
     : row;
 };
 
 const convertNested = (row) => {
   const {
-    status, name, value, children = null,
+    status, property, value, children = null,
   } = row;
-  if (children) return { status, name, children: children.map(convertNested) };
+  if (children) return { status, property, children: children.map(convertNested) };
 
   return isObject(value)
     ? {
       status,
-      name,
+      property,
       children: Object.entries(value)
         .map(([nestedKey, nestedValue]) => ({
           status: 'unchanged',
-          name: nestedKey,
+          property: nestedKey,
           value: nestedValue,
         }))
         .map(convertNested),
@@ -43,17 +43,17 @@ const statusMapping = {
 
 const stringifyRow = (row, nestingLevel) => {
   const {
-    status, name, value, children = null,
+    status, property, value, children = null,
   } = row;
   const indent = ' '.repeat(4 * nestingLevel - 2);
 
   return (children)
     ? [
-      `${indent}${statusMapping[status]} ${name}: {`,
+      `${indent}${statusMapping[status]} ${property}: {`,
       children.map((nestedRow) => stringifyRow(nestedRow, nestingLevel + 1)),
       `${indent}  }`,
     ]
-    : `${indent}${statusMapping[status]} ${name}: ${value}`;
+    : `${indent}${statusMapping[status]} ${property}: ${value}`;
 };
 
 export default (diff) => `{\n${

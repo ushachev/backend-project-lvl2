@@ -13,10 +13,12 @@ const getDiff = (extension, format = 'pretty') => {
 
 let expectedPretty;
 let expectedPlain;
+let expectedJson;
 
 beforeAll(() => {
   expectedPretty = fs.readFileSync(getFixturePath('pretty.txt'), 'utf8');
   expectedPlain = fs.readFileSync(getFixturePath('plain.txt'), 'utf8');
+  expectedJson = fs.readFileSync(getFixturePath('output.json'), 'utf8');
 });
 
 describe('pretty genDiff', () => {
@@ -36,5 +38,15 @@ describe('plain genDiff', () => {
     ['ini'],
   ])('from %s', (extension) => {
     expect(getDiff(extension, 'plain')).toEqual(expectedPlain);
+  });
+});
+
+describe('json genDiff', () => {
+  test.each([
+    ['json'],
+    ['yml'],
+    ['ini'],
+  ])('from %s', (extension) => {
+    expect(getDiff(extension, 'json')).toEqual(expectedJson);
   });
 });
