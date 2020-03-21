@@ -1,21 +1,21 @@
 [
   {
     "property": "common",
-    "status": "unchanged",
+    "type": "unchanged",
     "children": [
       {
         "property": "setting1",
-        "status": "unchanged",
+        "type": "unchanged",
         "value": "Value 1"
       },
       {
         "property": "setting2",
-        "status": "deleted",
+        "type": "deleted",
         "value": 200
       },
       {
         "property": "setting3",
-        "status": "changed",
+        "type": "changed",
         "value": true,
         "newValue": {
           "key": "value"
@@ -23,33 +23,33 @@
       },
       {
         "property": "setting6",
-        "status": "unchanged",
+        "type": "unchanged",
         "children": [
           {
             "property": "key",
-            "status": "unchanged",
+            "type": "unchanged",
             "value": "value"
           },
           {
             "property": "ops",
-            "status": "added",
+            "type": "added",
             "value": "vops"
           }
         ]
       },
       {
         "property": "follow",
-        "status": "added",
+        "type": "added",
         "value": false
       },
       {
         "property": "setting4",
-        "status": "added",
+        "type": "added",
         "value": "blah blah"
       },
       {
         "property": "setting5",
-        "status": "added",
+        "type": "added",
         "value": {
           "key5": "value5"
         }
@@ -58,22 +58,22 @@
   },
   {
     "property": "group1",
-    "status": "unchanged",
+    "type": "unchanged",
     "children": [
       {
         "property": "baz",
-        "status": "changed",
+        "type": "changed",
         "value": "bas",
         "newValue": "bars"
       },
       {
         "property": "foo",
-        "status": "unchanged",
+        "type": "unchanged",
         "value": "bar"
       },
       {
         "property": "nest",
-        "status": "changed",
+        "type": "changed",
         "value": {
           "key": "value"
         },
@@ -83,14 +83,14 @@
   },
   {
     "property": "group2",
-    "status": "deleted",
+    "type": "deleted",
     "value": {
       "abc": 12345
     }
   },
   {
     "property": "group3",
-    "status": "added",
+    "type": "added",
     "value": {
       "fee": 100500
     }

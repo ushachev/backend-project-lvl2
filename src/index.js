@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { union, has, isObject } from 'lodash';
+import {
+  union, keys, has, isObject,
+} from 'lodash';
 import getParser from './parsers';
 import { formatInPretty, formatInPlain, formatInJson } from './formatters';
 
@@ -15,27 +17,27 @@ const getConfig = (pathToFile) => {
 
 const propertyActions = [
   {
-    status: 'unchanged',
+    type: 'unchanged',
     check: (presence, value1, value2) => isObject(value1) && isObject(value2),
     process: (value1, value2, f) => ({ children: f(value1, value2) }),
   },
   {
-    status: 'unchanged',
+    type: 'unchanged',
     check: (presence, value1, value2) => value1 === value2,
     process: (value1) => ({ value: value1 }),
   },
   {
-    status: 'changed',
+    type: 'changed',
     check: (presence) => presence === 0,
     process: (value1, value2) => ({ value: value1, newValue: value2 }),
   },
   {
-    status: 'added',
+    type: 'added',
     check: (presence) => presence === 1,
     process: (value1, value2) => ({ value: value2 }),
   },
   {
-    status: 'deleted',
+    type: 'deleted',
     check: (presence) => presence === -1,
     process: (value1) => ({ value: value1 }),
   },
@@ -44,14 +46,14 @@ const propertyActions = [
 const getPropertyAction = (presence, value1, value2) => propertyActions
   .find(({ check }) => check(presence, value1, value2));
 
-const compareConfigs = (config1, config2) => union(Object.keys(config1), Object.keys(config2))
+const compareConfigs = (config1, config2) => union(keys(config1), keys(config2))
   .map((key) => {
     const presence = has(config2, key) - has(config1, key);
     const value1 = config1[key];
     const value2 = config2[key];
-    const { status, process } = getPropertyAction(presence, value1, value2);
+    const { type, process } = getPropertyAction(presence, value1, value2);
 
-    return { property: key, status, ...process(value1, value2, compareConfigs) };
+    return { property: key, type, ...process(value1, value2, compareConfigs) };
   });
 
 const formatters = {

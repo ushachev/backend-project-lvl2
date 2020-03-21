@@ -1,24 +1,24 @@
-import { isObject } from 'lodash';
+import { isObject, isString } from 'lodash';
 
 const format = (value) => {
   if (isObject(value)) return '[complex value]';
-  return typeof value === 'string' ? `'${value}'` : value;
+  return isString(value) ? `'${value}'` : value;
 };
 
 const propertyActions = [
   {
-    check: (status, children) => children,
+    check: (type, children) => children,
     process: (parent, { property, children }, f) => {
       const { rows } = children.reduce(f, { parent: [...parent, property], rows: [] });
       return rows;
     },
   },
   {
-    check: (status) => status === 'unchanged',
+    check: (type) => type === 'unchanged',
     process: () => [],
   },
   {
-    check: (status) => status === 'changed',
+    check: (type) => type === 'changed',
     process: (parent, { property, value, newValue }) => {
       const nestedProperty = [...parent, property].join('.');
       return [
@@ -27,25 +27,25 @@ const propertyActions = [
     },
   },
   {
-    check: (status) => status === 'deleted',
+    check: (type) => type === 'deleted',
     process: (parent, { property }) => [
       `Property '${[...parent, property].join('.')}' was deleted`,
     ],
   },
   {
-    check: (status) => status === 'added',
+    check: (type) => type === 'added',
     process: (parent, { property, value }) => [
       `Property '${[...parent, property].join('.')}' was added with value: ${format(value)}`,
     ],
   },
 ];
 
-const getPropertyAction = (status, children) => propertyActions
-  .find(({ check }) => check(status, children));
+const getPropertyAction = (type, children) => propertyActions
+  .find(({ check }) => check(type, children));
 
 const getFormattedRows = ({ parent, rows }, property) => {
-  const { status, children = null } = property;
-  const { process } = getPropertyAction(status, children);
+  const { type, children = null } = property;
+  const { process } = getPropertyAction(type, children);
 
   return { parent, rows: [...rows, ...process(parent, property, getFormattedRows)] };
 };

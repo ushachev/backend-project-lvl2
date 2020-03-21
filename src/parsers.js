@@ -1,12 +1,14 @@
 import yaml from 'js-yaml';
 import ini from 'ini';
-import { isObject } from 'lodash';
+import { isObject, entries } from 'lodash';
 
-const getConvertedContent = (acc, [key, value]) => (isObject(value)
-  ? { ...acc, [key]: Object.entries(value).reduce(getConvertedContent, {}) }
-  : { ...acc, [key]: parseInt(value, 10) || value });
+const getConvertedContent = (acc, [key, value]) => (
+  isObject(value)
+    ? { ...acc, [key]: entries(value).reduce(getConvertedContent, {}) }
+    : { ...acc, [key]: parseInt(value, 10) || value }
+);
 
-const parseIni = (content) => Object.entries(ini.parse(content)).reduce(getConvertedContent, {});
+const parseIni = (content) => entries(ini.parse(content)).reduce(getConvertedContent, {});
 
 const parserMapping = {
   '.json': JSON.parse,
