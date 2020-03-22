@@ -3,4 +3,10 @@ import formatInPlain from './plainFormatter';
 
 const formatInJson = (diff) => JSON.stringify(diff, null, 2);
 
-export { formatInPretty, formatInPlain, formatInJson };
+const formatters = {
+  pretty: formatInPretty,
+  plain: formatInPlain,
+  json: formatInJson,
+};
+
+export default (format, diff) => formatters[format](diff);
