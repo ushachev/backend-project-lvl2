@@ -6,45 +6,34 @@ import {
 import parseConfig from './parsers';
 import formatDiff from './formatters';
 
-const propertyActions = [
-  {
-    type: 'unchanged',
-    check: (presence, value1, value2) => isObject(value1) && isObject(value2),
-    process: (value1, value2, f) => ({ children: f(value1, value2) }),
-  },
-  {
-    type: 'unchanged',
-    check: (presence, value1, value2) => value1 === value2,
-    process: (value1) => ({ value: value1 }),
-  },
-  {
-    type: 'changed',
-    check: (presence) => presence === 0,
-    process: (value1, value2) => ({ value: value1, newValue: value2 }),
-  },
-  {
-    type: 'added',
-    check: (presence) => presence === 1,
-    process: (value1, value2) => ({ value: value2 }),
-  },
-  {
-    type: 'deleted',
-    check: (presence) => presence === -1,
-    process: (value1) => ({ value: value1 }),
-  },
-];
-
-const getPropertyAction = (presence, value1, value2) => propertyActions
-  .find(({ check }) => check(presence, value1, value2));
+const keyTypeChecks = {
+  changed: (isKeyInConfig1, isKeyInConfig2) => isKeyInConfig1 && isKeyInConfig2,
+  deleted: (isKeyInConfig1) => isKeyInConfig1,
+  added: (isKeyInConfig1, isKeyInConfig2) => isKeyInConfig2,
+};
+const keyTypes = keys(keyTypeChecks);
 
 const compareConfigs = (config1, config2) => union(keys(config1), keys(config2))
   .map((key) => {
-    const presence = has(config2, key) - has(config1, key);
+    const isKeyInConfig1 = has(config1, key);
+    const isKeyInConfig2 = has(config2, key);
+    const type = keyTypes
+      .find((keyType) => keyTypeChecks[keyType](isKeyInConfig1, isKeyInConfig2));
     const value1 = config1[key];
     const value2 = config2[key];
-    const { type, process } = getPropertyAction(presence, value1, value2);
+    if (isObject(value1) && isObject(value2)) {
+      return { property: key, type: 'unchanged', children: compareConfigs(value1, value2) };
+    }
+    if (value1 === value2) {
+      return { property: key, type: 'unchanged', value: value1 };
+    }
+    if (type === 'changed') {
+      return {
+        property: key, type, value: value1, newValue: value2,
+      };
+    }
 
-    return { property: key, type, ...process(value1, value2, compareConfigs) };
+    return { property: key, type, value: value1 || value2 };
   });
 
 const readFile = (pathToFile) => {
@@ -53,8 +42,10 @@ const readFile = (pathToFile) => {
 };
 
 const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {
-  const config1 = parseConfig(path.extname(pathToFile1), readFile(pathToFile1));
-  const config2 = parseConfig(path.extname(pathToFile2), readFile(pathToFile2));
+  const [, configType1] = path.extname(pathToFile1).split('.');
+  const [, configType2] = path.extname(pathToFile2).split('.');
+  const config1 = parseConfig(configType1, readFile(pathToFile1));
+  const config2 = parseConfig(configType2, readFile(pathToFile2));
   const diff = compareConfigs(config1, config2);
 
   return formatDiff(format, diff);

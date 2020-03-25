@@ -11,9 +11,9 @@ const getConvertedContent = (acc, [key, value]) => (
 const parseIni = (content) => entries(ini.parse(content)).reduce(getConvertedContent, {});
 
 const parsers = {
-  '.json': JSON.parse,
-  '.yml': yaml.load,
-  '.ini': parseIni,
+  json: JSON.parse,
+  yml: yaml.load,
+  ini: parseIni,
 };
 
-export default (extName, content) => parsers[extName](content);
+export default (type, content) => parsers[type](content);

@@ -12,4 +12,4 @@ test-coverage:
 	npm test -- --coverage
 build:
 	npm run build
-
+.PHONY: install test build

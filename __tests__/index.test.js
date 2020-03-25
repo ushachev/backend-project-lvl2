@@ -4,13 +4,6 @@ import genDiff from '../src';
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
-const getDiff = (extension, format) => {
-  const pathToFile1 = getFixturePath(`before.${extension}`);
-  const pathToFile2 = getFixturePath(`after.${extension}`);
-
-  return genDiff(pathToFile1, pathToFile2, format);
-};
-
 let expected;
 
 describe.each([
@@ -22,7 +15,15 @@ describe.each([
     expected = fs.readFileSync(getFixturePath(fixture), 'utf8');
   });
 
-  test.each(['json', 'yml', 'ini'])('from %s', (extension) => {
-    expect(getDiff(extension, format)).toEqual(expected);
+  test.each([
+    'json',
+    'yml',
+    'ini',
+  ])('from %s', (extension) => {
+    const pathToFile1 = getFixturePath(`before.${extension}`);
+    const pathToFile2 = getFixturePath(`after.${extension}`);
+    const actual = genDiff(pathToFile1, pathToFile2, format);
+
+    expect(actual).toEqual(expected);
   });
 });
