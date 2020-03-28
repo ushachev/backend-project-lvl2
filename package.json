@@ -1,6 +1,6 @@
 {
   "name": "genDiff",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "cli utility for comparing config files",
   "keywords": [
     "node.js",

@@ -1,66 +1,57 @@
 import { isObject, entries } from 'lodash';
 
-const convertChanged = (row) => {
-  const {
-    type, property, value, children = null, newValue,
-  } = row;
-  if (children) return { type, property, children: children.flatMap(convertChanged) };
-
-  return type === 'changed'
-    ? [
-      { type: 'deleted', property, value },
-      { type: 'added', property, value: newValue },
-    ]
-    : row;
-};
-
-const convertNested = (row) => {
-  const {
-    type, property, value, children = null,
-  } = row;
-  if (children) return { type, property, children: children.map(convertNested) };
-
-  return isObject(value)
-    ? {
-      type,
-      property,
-      children: entries(value)
-        .map(([nestedKey, nestedValue]) => ({
-          type: 'unchanged',
-          property: nestedKey,
-          value: nestedValue,
-        }))
-        .map(convertNested),
-    }
-    : row;
-};
-
 const typeMapping = {
+  complex: ' ',
   deleted: '-',
   added: '+',
   unchanged: ' ',
 };
 
-const stringifyRow = (row, nestingLevel) => {
-  const {
-    type, property, value, children = null,
-  } = row;
-  const indent = ' '.repeat(4 * nestingLevel - 2);
+const getIndent = (nestingLevel) => ' '.repeat(4 * nestingLevel - 2);
 
-  return (children)
+const stringifyValue = (nestingLevel, { property, type, value }) => {
+  const indent = getIndent(nestingLevel);
+  const nestedIndent = getIndent(nestingLevel + 1);
+
+  const stringifyNestedValue = ([key, nestedValue]) => (
+    isObject(nestedValue)
+      ? stringifyValue(nestingLevel + 1, { property: key, type: 'complex', value: nestedValue })
+      : `${nestedIndent}  ${key}: ${nestedValue}`
+  );
+
+  return isObject(value)
     ? [
       `${indent}${typeMapping[type]} ${property}: {`,
-      children.map((nestedRow) => stringifyRow(nestedRow, nestingLevel + 1)),
+      ...entries(value).map(stringifyNestedValue),
       `${indent}  }`,
     ]
-    : `${indent}${typeMapping[type]} ${property}: ${value}`;
+    : [`${indent}${typeMapping[type]} ${property}: ${value}`];
 };
 
-export default (diff) => `{\n${
-  diff
-    .flatMap(convertChanged)
-    .map(convertNested)
-    .map((row) => stringifyRow(row, 1))
-    .flat(Infinity)
-    .join('\n')
-}\n}`;
+const nodeMapping = {
+  complex: (nestingLevel, { property, children }, f) => {
+    const indent = getIndent(nestingLevel);
+    return [
+      `${indent}${typeMapping.complex} ${property}: {`,
+      ...children.flatMap((node) => f(nestingLevel + 1, node)),
+      `${indent}  }`,
+    ];
+  },
+  changed: (nestingLevel, { property, value, newValue }) => [
+    ...stringifyValue(nestingLevel, { property, type: 'deleted', value }),
+    ...stringifyValue(nestingLevel, { property, type: 'added', value: newValue }),
+  ],
+  unchanged: stringifyValue,
+  deleted: stringifyValue,
+  added: stringifyValue,
+};
+
+const stringifyNode = (nestingLevel, node) => {
+  const { type } = node;
+  return nodeMapping[type](nestingLevel, node, stringifyNode);
+};
+
+export default (diff) => {
+  const rows = diff.flatMap((node) => stringifyNode(1, node));
+  return `{\n${rows.join('\n')}\n}`;
+};

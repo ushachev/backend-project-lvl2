@@ -1,7 +1,7 @@
 [
   {
     "property": "common",
-    "type": "unchanged",
+    "type": "complex",
     "children": [
       {
         "property": "setting1",
@@ -23,7 +23,7 @@
       },
       {
         "property": "setting6",
-        "type": "unchanged",
+        "type": "complex",
         "children": [
           {
             "property": "key",
@@ -58,7 +58,7 @@
   },
   {
     "property": "group1",
-    "type": "unchanged",
+    "type": "complex",
     "children": [
       {
         "property": "baz",

@@ -8,7 +8,7 @@ Educational "Project #2" is being developed as part of "Backend Javascript (node
 # Config difference generator
 Compares two configuration files and shows a difference.
 
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fushachev%2Fbackend-project-lvl2%2Fbadge%3Fref%3Dmaster&style=flat)](https://actions-badge.atrox.dev/ushachev/backend-project-lvl2/goto?ref=master)
+[![Node.js CI](https://github.com/ushachev/backend-project-lvl2/workflows/Node.js%20CI/badge.svg)](https://github.com/ushachev/backend-project-lvl2/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/cf8e444c79a3b4fee878/maintainability)](https://codeclimate.com/github/ushachev/backend-project-lvl2/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/cf8e444c79a3b4fee878/test_coverage)](https://codeclimate.com/github/ushachev/backend-project-lvl2/test_coverage)
 
