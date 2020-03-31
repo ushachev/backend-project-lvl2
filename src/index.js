@@ -15,22 +15,22 @@ const propertyActions = [
   {
     type: 'unchanged',
     check: (value1, value2) => value1 === value2,
-    process: (value1) => ({ value: value1 }),
+    process: (value1) => ({ oldValue: value1 }),
   },
   {
     type: 'changed',
     check: (value1, value2, isKeyInConfig1, isKeyInConfig2) => isKeyInConfig1 && isKeyInConfig2,
-    process: (value1, value2) => ({ value: value1, newValue: value2 }),
+    process: (value1, value2) => ({ oldValue: value1, newValue: value2 }),
   },
   {
     type: 'deleted',
     check: (value1, value2, isKeyInConfig1) => isKeyInConfig1,
-    process: (value1) => ({ value: value1 }),
+    process: (value1) => ({ oldValue: value1 }),
   },
   {
     type: 'added',
     check: (value1, value2, isKeyInConfig1, isKeyInConfig2) => isKeyInConfig2,
-    process: (value1, value2) => ({ value: value2 }),
+    process: (value1, value2) => ({ newValue: value2 }),
   },
 ];
 
@@ -54,8 +54,8 @@ const readFile = (pathToFile) => {
 };
 
 const genDiff = (pathToFile1, pathToFile2, format = 'pretty') => {
-  const [, configType1] = path.extname(pathToFile1).split('.');
-  const [, configType2] = path.extname(pathToFile2).split('.');
+  const configType1 = path.extname(pathToFile1).slice(1);
+  const configType2 = path.extname(pathToFile2).slice(1);
   const config1 = parseConfig(configType1, readFile(pathToFile1));
   const config2 = parseConfig(configType2, readFile(pathToFile2));
   const diff = compareConfigs(config1, config2);

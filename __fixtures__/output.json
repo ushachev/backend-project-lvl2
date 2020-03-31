@@ -6,17 +6,17 @@
       {
         "property": "setting1",
         "type": "unchanged",
-        "value": "Value 1"
+        "oldValue": "Value 1"
       },
       {
         "property": "setting2",
         "type": "deleted",
-        "value": 200
+        "oldValue": 200
       },
       {
         "property": "setting3",
         "type": "changed",
-        "value": true,
+        "oldValue": true,
         "newValue": {
           "key": "value"
         }
@@ -28,29 +28,29 @@
           {
             "property": "key",
             "type": "unchanged",
-            "value": "value"
+            "oldValue": "value"
           },
           {
             "property": "ops",
             "type": "added",
-            "value": "vops"
+            "newValue": "vops"
           }
         ]
       },
       {
         "property": "follow",
         "type": "added",
-        "value": false
+        "newValue": false
       },
       {
         "property": "setting4",
         "type": "added",
-        "value": "blah blah"
+        "newValue": "blah blah"
       },
       {
         "property": "setting5",
         "type": "added",
-        "value": {
+        "newValue": {
           "key5": "value5"
         }
       }
@@ -63,18 +63,18 @@
       {
         "property": "baz",
         "type": "changed",
-        "value": "bas",
+        "oldValue": "bas",
         "newValue": "bars"
       },
       {
         "property": "foo",
         "type": "unchanged",
-        "value": "bar"
+        "oldValue": "bar"
       },
       {
         "property": "nest",
         "type": "changed",
-        "value": {
+        "oldValue": {
           "key": "value"
         },
         "newValue": "str"
@@ -84,14 +84,14 @@
   {
     "property": "group2",
     "type": "deleted",
-    "value": {
+    "oldValue": {
       "abc": 12345
     }
   },
   {
     "property": "group3",
     "type": "added",
-    "value": {
+    "newValue": {
       "fee": 100500
     }
   }

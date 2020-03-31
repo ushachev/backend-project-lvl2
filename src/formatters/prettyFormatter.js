@@ -1,57 +1,57 @@
 import { isObject, entries } from 'lodash';
 
-const typeMapping = {
-  complex: ' ',
-  deleted: '-',
-  added: '+',
-  unchanged: ' ',
-};
-
-const getIndent = (nestingLevel) => ' '.repeat(4 * nestingLevel - 2);
-
-const stringifyValue = (nestingLevel, { property, type, value }) => {
-  const indent = getIndent(nestingLevel);
-  const nestedIndent = getIndent(nestingLevel + 1);
+const stringifyValue = (nestingLevel, property, marker, value) => {
+  const indent = ' '.repeat(4 * nestingLevel + 2);
+  const closingIndent = ' '.repeat(4 * (nestingLevel + 1));
+  const nestedIndent = ' '.repeat(4 * (nestingLevel + 2));
 
   const stringifyNestedValue = ([key, nestedValue]) => (
     isObject(nestedValue)
-      ? stringifyValue(nestingLevel + 1, { property: key, type: 'complex', value: nestedValue })
-      : `${nestedIndent}  ${key}: ${nestedValue}`
+      ? stringifyValue(nestingLevel + 1, key, ' ', nestedValue)
+      : `${nestedIndent}${key}: ${nestedValue}`
   );
 
   return isObject(value)
     ? [
-      `${indent}${typeMapping[type]} ${property}: {`,
+      `${indent}${marker} ${property}: {`,
       ...entries(value).map(stringifyNestedValue),
-      `${indent}  }`,
+      `${closingIndent}}`,
     ]
-    : [`${indent}${typeMapping[type]} ${property}: ${value}`];
+    : [`${indent}${marker} ${property}: ${value}`];
 };
 
 const nodeMapping = {
-  complex: (nestingLevel, { property, children }, f) => {
-    const indent = getIndent(nestingLevel);
-    return [
-      `${indent}${typeMapping.complex} ${property}: {`,
-      ...children.flatMap((node) => f(nestingLevel + 1, node)),
-      `${indent}  }`,
-    ];
-  },
-  changed: (nestingLevel, { property, value, newValue }) => [
-    ...stringifyValue(nestingLevel, { property, type: 'deleted', value }),
-    ...stringifyValue(nestingLevel, { property, type: 'added', value: newValue }),
+  changed: (nestingLevel, { property, oldValue, newValue }) => [
+    ...stringifyValue(nestingLevel, property, '-', oldValue),
+    ...stringifyValue(nestingLevel, property, '+', newValue),
   ],
-  unchanged: stringifyValue,
-  deleted: stringifyValue,
-  added: stringifyValue,
+  unchanged: (nestingLevel, { property, oldValue }) => (
+    stringifyValue(nestingLevel, property, ' ', oldValue)
+  ),
+  deleted: (nestingLevel, { property, oldValue }) => (
+    stringifyValue(nestingLevel, property, '-', oldValue)
+  ),
+  added: (nestingLevel, { property, newValue }) => (
+    stringifyValue(nestingLevel, property, '+', newValue)
+  ),
 };
 
-const stringifyNode = (nestingLevel, node) => {
-  const { type } = node;
-  return nodeMapping[type](nestingLevel, node, stringifyNode);
+const stringifyDiff = (diff, nestingLevel = 0) => {
+  const rows = diff.flatMap((node) => {
+    const { type } = node;
+
+    if (type === 'complex') {
+      const { property, children } = node;
+      const indent = ' '.repeat(4 * (nestingLevel + 1));
+
+      return `${indent}${property}: ${stringifyDiff(children, nestingLevel + 1)}`;
+    }
+
+    return nodeMapping[type](nestingLevel, node);
+  });
+  const closingIndent = ' '.repeat(4 * nestingLevel);
+
+  return `{\n${rows.join('\n')}\n${closingIndent}}`;
 };
 
-export default (diff) => {
-  const rows = diff.flatMap((node) => stringifyNode(1, node));
-  return `{\n${rows.join('\n')}\n}`;
-};
+export default (diff) => stringifyDiff(diff);

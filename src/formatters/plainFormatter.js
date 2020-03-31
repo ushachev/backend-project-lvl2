@@ -6,37 +6,41 @@ const stringifyValue = (value) => {
 };
 
 const nodeMapping = {
-  complex: (parents, { property, children }, f) => children
-    .flatMap((node) => f([...parents, property], node)),
   unchanged: () => [],
-  changed: (parents, { property, value, newValue }) => [
-    [
-      'Property',
-      `'${[...parents, property].join('.')}'`,
-      'was changed from',
-      stringifyValue(value),
-      'to',
-      stringifyValue(newValue),
-    ].join(' '),
-  ],
-  deleted: (parents, { property }) => [
-    `Property '${[...parents, property].join('.')}' was deleted`,
-  ],
-  added: (parents, { property, value }) => [
-    [
-      'Property',
-      `'${[...parents, property].join('.')}'`,
-      'was added with value:',
-      stringifyValue(value),
-    ].join(' '),
-  ],
+  changed: (parents, { property, oldValue, newValue }) => {
+    const propertyName = [...parents, property].join('.');
+    const stringifiedOldValue = stringifyValue(oldValue);
+    const stringifiedNewValue = stringifyValue(newValue);
+
+    return `Property '${propertyName}' was changed from ${stringifiedOldValue} to ${
+      stringifiedNewValue
+    }`;
+  },
+  deleted: (parents, { property }) => {
+    const propertyName = [...parents, property].join('.');
+    return `Property '${propertyName}' was deleted`;
+  },
+  added: (parents, { property, newValue }) => {
+    const propertyName = [...parents, property].join('.');
+    const stringifiedValue = stringifyValue(newValue);
+
+    return `Property '${propertyName}' was added with value: ${stringifiedValue}`;
+  },
 };
 
-const stringifyNode = (parents, node) => {
-  const { type } = node;
-  return nodeMapping[type](parents, node, stringifyNode);
+const stringifyDiff = (diff, parents = []) => {
+  const rows = diff.flatMap((node) => {
+    const { type } = node;
+
+    if (type === 'complex') {
+      const { property, children } = node;
+      return stringifyDiff(children, [...parents, property]);
+    }
+
+    return nodeMapping[type](parents, node);
+  });
+
+  return rows.join('\n');
 };
 
-export default (diff) => diff
-  .flatMap((node) => stringifyNode([], node))
-  .join('\n');
+export default (diff) => stringifyDiff(diff);
