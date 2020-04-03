@@ -6,6 +6,7 @@ const stringifyValue = (value) => {
 };
 
 const nodeMapping = {
+  complex: (parents, { property, children }, f) => f(children, [...parents, property]),
   unchanged: () => [],
   changed: (parents, { property, oldValue, newValue }) => {
     const propertyName = [...parents, property].join('.');
@@ -31,13 +32,7 @@ const nodeMapping = {
 const stringifyDiff = (diff, parents = []) => {
   const rows = diff.flatMap((node) => {
     const { type } = node;
-
-    if (type === 'complex') {
-      const { property, children } = node;
-      return stringifyDiff(children, [...parents, property]);
-    }
-
-    return nodeMapping[type](parents, node);
+    return nodeMapping[type](parents, node, stringifyDiff);
   });
 
   return rows.join('\n');
