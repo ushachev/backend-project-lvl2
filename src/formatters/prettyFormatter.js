@@ -1,26 +1,23 @@
 import { isObject, entries } from 'lodash';
 
 const stringifyValue = (nestingLevel, property, marker, value) => {
-  const stringifyNestedValue = (nestedIndent, [key, nestedValue]) => {
-    if (isObject(nestedValue)) {
-      return stringifyValue(nestingLevel + 1, key, ' ', nestedValue);
-    }
-    return `${nestedIndent}${key}: ${nestedValue}`;
-  };
   const indent = ' '.repeat(4 * nestingLevel + 2);
 
-  if (isObject(value)) {
-    const nestedIndent = ' '.repeat(4 * (nestingLevel + 2));
-    const closingIndent = ' '.repeat(4 * (nestingLevel + 1));
+  if (!isObject(value)) return [`${indent}${marker} ${property}: ${value}`];
 
-    return [
-      `${indent}${marker} ${property}: {`,
-      ...entries(value).map((entry) => stringifyNestedValue(nestedIndent, entry)),
-      `${closingIndent}}`,
-    ];
-  }
+  const nestedIndent = ' '.repeat(4 * (nestingLevel + 2));
+  const closingIndent = ' '.repeat(4 * (nestingLevel + 1));
 
-  return [`${indent}${marker} ${property}: ${value}`];
+  const stringifyNestedValue = ([key, nestedValue]) => {
+    if (!isObject(nestedValue)) return `${nestedIndent}${key}: ${nestedValue}`;
+    return stringifyValue(nestingLevel + 1, key, ' ', nestedValue);
+  };
+
+  return [
+    `${indent}${marker} ${property}: {`,
+    ...entries(value).map(stringifyNestedValue),
+    `${closingIndent}}`,
+  ];
 };
 
 const nodeMapping = {
